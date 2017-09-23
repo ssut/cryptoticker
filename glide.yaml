@@ -1,0 +1,14 @@
+package: github.com/ssut/cryptoticker
+import:
+- package: github.com/fatih/structs
+  version: ^1.0.0
+- package: github.com/parnurzeal/gorequest
+  version: ^0.2.15
+- package: github.com/shopspring/decimal
+testImport:
+- package: github.com/smartystreets/goconvey
+  version: ^1.6.3
+  subpackages:
+  - convey
+- package: gopkg.in/h2non/gock.v1
+  version: ^1.0.6
