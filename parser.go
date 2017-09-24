@@ -66,3 +66,9 @@ func NewParser(p TickerType) *Parser {
 
 	return &Parser{parser: parser}
 }
+
+// Parse tries to fetch and parse ticker data from the market, and returns IParsableTicker
+func (p *Parser) Parse() (IParsableTicker, error) {
+	ticker, err := p.parser.RawTicker()
+	return ticker, err
+}
