@@ -20,7 +20,7 @@ type coinoneMarketTicker struct {
 }
 
 type coinoneTicker struct {
-	Result bool
+	Result string
 	BTC    *coinoneMarketTicker
 	BCH    *coinoneMarketTicker
 	ETH    *coinoneMarketTicker

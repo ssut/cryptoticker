@@ -23,7 +23,7 @@ func TestCoinoneParser(t *testing.T) {
 
 	Convey("Given a sample data", t, func() {
 		raw := map[string]interface{}{
-			"result": true,
+			"result": "success",
 			"btc": map[string]string{
 				"currency": "btc",
 				"volume":   "100.0000",
@@ -43,7 +43,7 @@ func TestCoinoneParser(t *testing.T) {
 
 		Convey(".RawTicker() should return a CoinoneTicker that contains the same data", func() {
 			expected := &coinoneTicker{
-				Result: true,
+				Result: "success",
 				BTC:    &coinoneMarketTicker{"btc", "100.0000", "1000000", "1000000", "1000000", "1000000"},
 			}
 			actual, err := coinoneTestParser.RawTicker()
