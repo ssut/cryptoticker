@@ -2,20 +2,20 @@ package cryptoticker
 
 import "strings"
 
-// ParserType represents makerts
-type ParserType int
+// TickerType represents makerts
+type TickerType int
 
 const (
-	CoinoneParserType  ParserType = 1 << iota // Coinone
-	BithumbParserType                         // Bithumb
-	PoloniexParserType                        // Poloniex
-	BittrexParerType                          // Bittrex
+	CoinoneTicker  TickerType = 1 << iota // Coinone
+	BithumbTicker                         // Bithumb
+	PoloniexTicker                        // Poloniex
+	BittrexTicker                         // Bittrex
 )
 
-// IParsableTicker represents a object that can parse and return ParserTicker
+// IParsableTicker represents a object that can parse and return Ticker
 type IParsableTicker interface {
 	Coins() ([]*CurrencyPair, error)
-	Tickers() ([]*ParserTicker, error)
+	Tickers() ([]*Ticker, error)
 }
 
 // IParser represents a object that can parse and return a IParsableTicker
@@ -24,8 +24,8 @@ type IParser interface {
 	RawTicker() (IParsableTicker, error)
 }
 
-// ParserTicker represents a Ticker
-type ParserTicker struct {
+// Ticker represents a Ticker
+type Ticker struct {
 	Currency *CurrencyPair
 	Volume   string
 	Last     string
@@ -51,17 +51,17 @@ type Parser struct {
 }
 
 // NewParser returns a new Crypto Client with specific market
-func NewParser(p ParserType) *Parser {
+func NewParser(p TickerType) *Parser {
 	var parser IParser
 	switch p {
-	case CoinoneParserType:
-		parser = NewCoinoneParser()
-	case BithumbParserType:
-		parser = NewBithumbParser()
-	case PoloniexParserType:
-		parser = NewPoloniexParser()
-	case BittrexParerType:
-		parser = NewBittrexParser()
+	case CoinoneTicker:
+		parser = newCoinoneParser()
+	case BithumbTicker:
+		parser = newBithumbParser()
+	case PoloniexTicker:
+		parser = newPoloniexParser()
+	case BittrexTicker:
+		parser = newBittrexParser()
 	}
 
 	return &Parser{parser: parser}

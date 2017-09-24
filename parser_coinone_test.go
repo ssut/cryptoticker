@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	coinoneParser *CoinoneParser
+	coinoneTestParser *coinoneParser
 )
 
 func prepareCoinoneParser() {
-	coinoneParser = NewCoinoneParser()
+	coinoneTestParser = newCoinoneParser()
 	gorequest.DisableTransportSwap = true
 }
 
@@ -34,7 +34,7 @@ func TestCoinoneParser(t *testing.T) {
 			},
 		}
 
-		gock.New(CoinoneParserBaseURL).
+		gock.New(coinoneParserBaseURL).
 			Get("/ticker").
 			MatchParam("format", "json").
 			ParamPresent("currency").
@@ -42,16 +42,16 @@ func TestCoinoneParser(t *testing.T) {
 			JSON(raw)
 
 		Convey(".RawTicker() should return a CoinoneTicker that contains the same data", func() {
-			expected := &CoinoneTicker{
+			expected := &coinoneTicker{
 				Result: true,
-				BTC:    &CoinoneMarketTicker{"btc", "100.0000", "1000000", "1000000", "1000000", "1000000"},
+				BTC:    &coinoneMarketTicker{"btc", "100.0000", "1000000", "1000000", "1000000", "1000000"},
 			}
-			actual, err := coinoneParser.RawTicker()
+			actual, err := coinoneTestParser.RawTicker()
 			So(err, ShouldBeNil)
 			So(actual, ShouldResemble, expected)
 
-			Convey(".Ticker() should return a list of ParserTicker", func() {
-				expected := []*ParserTicker{
+			Convey(".Ticker() should return a list of Ticker", func() {
+				expected := []*Ticker{
 					{
 						&CurrencyPair{"KRW", "BTC"},
 						"100.0000",

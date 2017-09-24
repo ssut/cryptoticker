@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	BittrexParserBaseURL    = "https://bittrex.com"
-	BittrexParserTickerPath = "/api/v1.1/public/getmarketsummaries"
+	bittrexParserBaseURL    = "https://bittrex.com"
+	bittrexParserTickerPath = "/api/v1.1/public/getmarketsummaries"
 )
 
-type BittrexMarketTicker struct {
+type bittrexMarketTicker struct {
 	Currency string `json:"MarketName"`
 	Volume   float64
 	Last     float64
@@ -21,29 +21,29 @@ type BittrexMarketTicker struct {
 	First    float64 `json:"PrevDay"`
 }
 
-type BittrexTicker struct {
+type bittrexTicker struct {
 	Success bool
 	Message string
-	Result  []*BittrexMarketTicker
+	Result  []*bittrexMarketTicker
 }
 
-type BittrexParser struct {
+type bittrexParser struct {
 	client *gorequest.SuperAgent
 }
 
-func NewBittrexParser() *BittrexParser {
-	parser := &BittrexParser{
+func newBittrexParser() *bittrexParser {
+	parser := &bittrexParser{
 		client: gorequest.New(),
 	}
 	return parser
 }
 
-func (p *BittrexParser) TickerURLString() string {
-	return BittrexParserBaseURL + BittrexParserTickerPath
+func (p *bittrexParser) TickerURLString() string {
+	return bittrexParserBaseURL + bittrexParserTickerPath
 }
 
-func (p *BittrexParser) RawTicker() (IParsableTicker, error) {
-	var ticker BittrexTicker
+func (p *bittrexParser) RawTicker() (IParsableTicker, error) {
+	var ticker bittrexTicker
 	_, _, err := p.client.Get(p.TickerURLString()).EndStruct(&ticker)
 	if err != nil {
 		return nil, err[0]
@@ -52,7 +52,7 @@ func (p *BittrexParser) RawTicker() (IParsableTicker, error) {
 	return &ticker, nil
 }
 
-func (t *BittrexTicker) Coins() ([]*CurrencyPair, error) {
+func (t *bittrexTicker) Coins() ([]*CurrencyPair, error) {
 	pairs := make([]*CurrencyPair, len(t.Result))
 	for i, coin := range t.Result {
 		sep := strings.Split(coin.Currency, "-")
@@ -63,13 +63,13 @@ func (t *BittrexTicker) Coins() ([]*CurrencyPair, error) {
 	return pairs, nil
 }
 
-func (t *BittrexTicker) Tickers() ([]*ParserTicker, error) {
-	tickers := make([]*ParserTicker, len(t.Result))
+func (t *bittrexTicker) Tickers() ([]*Ticker, error) {
+	tickers := make([]*Ticker, len(t.Result))
 	coins, _ := t.Coins()
 
 	for i, currency := range coins {
 		data := t.Result[i]
-		ticker := &ParserTicker{
+		ticker := &Ticker{
 			currency,
 			decimal.NewFromFloat(data.Volume).String(),
 			decimal.NewFromFloat(data.Last).String(),

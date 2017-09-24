@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	poloniexParser *PoloniexParser
+	poloniexTestParser *poloniexParser
 )
 
 func preparePoloParser() {
-	poloniexParser = NewPoloniexParser()
+	poloniexTestParser = newPoloniexParser()
 	gorequest.DisableTransportSwap = true
 }
 
@@ -33,14 +33,14 @@ func TestPoloniexParser(t *testing.T) {
 			},
 		}
 
-		gock.New(PoloniexParserBaseURL).
+		gock.New(poloniexParserBaseURL).
 			Get("/public").
 			MatchParam("command", "returnTicker").
 			Reply(200).
 			JSON(raw)
 
-		Convey(".RawTicker() should return a PoloniexTicker that contains the same data", func() {
-			expected := &PoloniexTicker{
+		Convey(".RawTicker() should return a poloniexTicker that contains the same data", func() {
+			expected := &poloniexTicker{
 				"BTC_ETH": {
 					1,
 					"1000.1234",
@@ -50,12 +50,12 @@ func TestPoloniexParser(t *testing.T) {
 					"0.1",
 				},
 			}
-			actual, err := poloniexParser.RawTicker()
+			actual, err := poloniexTestParser.RawTicker()
 			So(err, ShouldBeNil)
 			So(actual, ShouldResemble, expected)
 
-			Convey(".Ticker() should return a list of ParserTicker", func() {
-				expected := []*ParserTicker{
+			Convey(".Ticker() should return a list of Ticker", func() {
+				expected := []*Ticker{
 					{
 						&CurrencyPair{"BTC", "ETH"},
 						"1000.1234",

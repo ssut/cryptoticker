@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	bittrexParser *BittrexParser
+	bittrexTestParser *bittrexParser
 )
 
 func prepareBittrexParser() {
-	bittrexParser = NewBittrexParser()
+	bittrexTestParser = newBittrexParser()
 	gorequest.DisableTransportSwap = true
 }
 
@@ -37,16 +37,16 @@ func TestBittrexParser(t *testing.T) {
 			},
 		}
 
-		gock.New(BittrexParserBaseURL).
-			Get(BittrexParserTickerPath).
+		gock.New(bittrexParserBaseURL).
+			Get(bittrexParserTickerPath).
 			Reply(200).
 			JSON(raw)
 
 		Convey(".RawTicker() should return a BittrexTicker that contains the same data", func() {
-			expected := &BittrexTicker{
+			expected := &bittrexTicker{
 				Success: true,
 				Message: "",
-				Result: []*BittrexMarketTicker{
+				Result: []*bittrexMarketTicker{
 					{
 						Currency: "BTC-ETH",
 						High:     0.12345678,
@@ -57,12 +57,12 @@ func TestBittrexParser(t *testing.T) {
 					},
 				},
 			}
-			actual, err := bittrexParser.RawTicker()
+			actual, err := bittrexTestParser.RawTicker()
 			So(err, ShouldBeNil)
 			So(actual, ShouldResemble, expected)
 
 			Convey(".Ticker() should return a list of BittrexParser", func() {
-				expected := []*ParserTicker{
+				expected := []*Ticker{
 					{
 						&CurrencyPair{"BTC", "ETH"},
 						"10000.12345678",

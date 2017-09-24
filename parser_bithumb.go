@@ -3,11 +3,11 @@ package cryptoticker
 import "github.com/parnurzeal/gorequest"
 
 const (
-	BithumbParserBaseURL    = "https://api.bithumb.com"
-	BithumbParserTickerPath = "/public/ticker/ALL"
+	bithumbParserBaseURL    = "https://api.bithumb.com"
+	bithumbParserTickerPath = "/public/ticker/ALL"
 )
 
-type BithumbMarketTicker struct {
+type bithumbMarketTicker struct {
 	Volume1D string `json:"volume_1day"`
 	Volume7D string `json:"volume_7day"`
 	Last     string `json:"closing_price"`
@@ -16,30 +16,30 @@ type BithumbMarketTicker struct {
 	First    string `json:"opening_price"`
 }
 
-type BithumbDataMap = map[string]BithumbMarketTicker
+type bithumbDataMap = map[string]bithumbMarketTicker
 
-type BithumbTicker struct {
+type bithumbTicker struct {
 	Status string
-	Data   BithumbDataMap
+	Data   bithumbDataMap
 }
 
-type BithumbParser struct {
+type bithumbParser struct {
 	client *gorequest.SuperAgent
 }
 
-func NewBithumbParser() *BithumbParser {
-	parser := &BithumbParser{
+func newBithumbParser() *bithumbParser {
+	parser := &bithumbParser{
 		client: gorequest.New(),
 	}
 	return parser
 }
 
-func (p *BithumbParser) TickerURLString() string {
-	return BithumbParserBaseURL + BithumbParserTickerPath
+func (p *bithumbParser) TickerURLString() string {
+	return bithumbParserBaseURL + bithumbParserTickerPath
 }
 
-func (p *BithumbParser) RawTicker() (IParsableTicker, error) {
-	var ticker BithumbTicker
+func (p *bithumbParser) RawTicker() (IParsableTicker, error) {
+	var ticker bithumbTicker
 	_, _, err := p.client.Get(p.TickerURLString()).EndStruct(&ticker)
 	if err != nil {
 		return nil, err[0]
@@ -48,7 +48,7 @@ func (p *BithumbParser) RawTicker() (IParsableTicker, error) {
 	return &ticker, nil
 }
 
-func (t *BithumbTicker) Coins() ([]*CurrencyPair, error) {
+func (t *bithumbTicker) Coins() ([]*CurrencyPair, error) {
 	pairs := []*CurrencyPair{}
 	for key := range t.Data {
 		pair := &CurrencyPair{"KRW", key}
@@ -57,13 +57,13 @@ func (t *BithumbTicker) Coins() ([]*CurrencyPair, error) {
 	return pairs, nil
 }
 
-func (t *BithumbTicker) Tickers() ([]*ParserTicker, error) {
-	tickers := []*ParserTicker{}
+func (t *bithumbTicker) Tickers() ([]*Ticker, error) {
+	tickers := []*Ticker{}
 	coins, _ := t.Coins()
 
 	for _, currency := range coins {
 		data := t.Data[currency.Next]
-		ticker := &ParserTicker{
+		ticker := &Ticker{
 			currency,
 			data.Volume1D,
 			data.Last,

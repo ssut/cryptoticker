@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	CoinoneParserBaseURL    = "https://api.coinone.co.kr"
-	CoinoneParserTickerPath = "/ticker/?format=json&currency="
+	coinoneParserBaseURL    = "https://api.coinone.co.kr"
+	coinoneParserTickerPath = "/ticker/?format=json&currency="
 )
 
-type CoinoneMarketTicker struct {
+type coinoneMarketTicker struct {
 	Currency string
 	Volume   string
 	Last     string
@@ -19,33 +19,33 @@ type CoinoneMarketTicker struct {
 	First    string
 }
 
-type CoinoneTicker struct {
+type coinoneTicker struct {
 	Result bool
-	BTC    *CoinoneMarketTicker
-	BCH    *CoinoneMarketTicker
-	ETH    *CoinoneMarketTicker
-	ETC    *CoinoneMarketTicker
-	XRP    *CoinoneMarketTicker
-	QTUM   *CoinoneMarketTicker
+	BTC    *coinoneMarketTicker
+	BCH    *coinoneMarketTicker
+	ETH    *coinoneMarketTicker
+	ETC    *coinoneMarketTicker
+	XRP    *coinoneMarketTicker
+	QTUM   *coinoneMarketTicker
 }
 
-type CoinoneParser struct {
+type coinoneParser struct {
 	client *gorequest.SuperAgent
 }
 
-func NewCoinoneParser() *CoinoneParser {
-	parser := &CoinoneParser{
+func newCoinoneParser() *coinoneParser {
+	parser := &coinoneParser{
 		client: gorequest.New(),
 	}
 	return parser
 }
 
-func (p *CoinoneParser) TickerURLString() string {
-	return CoinoneParserBaseURL + CoinoneParserTickerPath
+func (p *coinoneParser) TickerURLString() string {
+	return coinoneParserBaseURL + coinoneParserTickerPath
 }
 
-func (p *CoinoneParser) RawTicker() (IParsableTicker, error) {
-	var ticker CoinoneTicker
+func (p *coinoneParser) RawTicker() (IParsableTicker, error) {
+	var ticker coinoneTicker
 	_, _, err := p.client.Get(p.TickerURLString()).EndStruct(&ticker)
 	if err != nil {
 		// return the first error because it contains multiple errors
@@ -56,7 +56,7 @@ func (p *CoinoneParser) RawTicker() (IParsableTicker, error) {
 }
 
 // Coins returns a list of supported cryptocurrency pairs
-func (t *CoinoneTicker) Coins() ([]*CurrencyPair, error) {
+func (t *coinoneTicker) Coins() ([]*CurrencyPair, error) {
 	pairs := []*CurrencyPair{
 		{"KRW", "BTC"},
 		{"KRW", "BCH"},
@@ -68,9 +68,9 @@ func (t *CoinoneTicker) Coins() ([]*CurrencyPair, error) {
 	return pairs, nil
 }
 
-// Tickers returns a list of ParserTicker
-func (t *CoinoneTicker) Tickers() ([]*ParserTicker, error) {
-	tickers := []*ParserTicker{}
+// Tickers returns a list of Ticker
+func (t *coinoneTicker) Tickers() ([]*Ticker, error) {
+	tickers := []*Ticker{}
 	coins, _ := t.Coins()
 
 	s := structs.New(t)
@@ -83,9 +83,9 @@ func (t *CoinoneTicker) Tickers() ([]*ParserTicker, error) {
 				if t == nil || field.IsZero() {
 					break
 				}
-				ct := t.(*CoinoneMarketTicker)
+				ct := t.(*coinoneMarketTicker)
 
-				ticker := &ParserTicker{
+				ticker := &Ticker{
 					currency,
 					ct.Volume,
 					ct.Last,

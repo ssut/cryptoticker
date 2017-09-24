@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	PoloniexParserBaseURL    = "https://www.poloniex.com"
-	PoloniexParserTickerPath = "/public?command=returnTicker"
+	poloniexParserBaseURL    = "https://www.poloniex.com"
+	poloniexParserTickerPath = "/public?command=returnTicker"
 )
 
-type PoloniexMarketTicker struct {
+type poloniexMarketTicker struct {
 	ID          int
 	Volume      string `json:"quoteVolume"`
 	Last        string
@@ -21,25 +21,25 @@ type PoloniexMarketTicker struct {
 	PercentDiff string `json:"percentChange"`
 }
 
-type PoloniexTicker map[string]PoloniexMarketTicker
+type poloniexTicker map[string]poloniexMarketTicker
 
-type PoloniexParser struct {
+type poloniexParser struct {
 	client *gorequest.SuperAgent
 }
 
-func NewPoloniexParser() *PoloniexParser {
-	parser := &PoloniexParser{
+func newPoloniexParser() *poloniexParser {
+	parser := &poloniexParser{
 		client: gorequest.New(),
 	}
 	return parser
 }
 
-func (p *PoloniexParser) TickerURLString() string {
-	return PoloniexParserBaseURL + PoloniexParserTickerPath
+func (p *poloniexParser) TickerURLString() string {
+	return poloniexParserBaseURL + poloniexParserTickerPath
 }
 
-func (p *PoloniexParser) RawTicker() (IParsableTicker, error) {
-	var ticker PoloniexTicker
+func (p *poloniexParser) RawTicker() (IParsableTicker, error) {
+	var ticker poloniexTicker
 	_, _, err := p.client.Get(p.TickerURLString()).EndStruct(&ticker)
 	if err != nil {
 		return nil, err[0]
@@ -48,7 +48,7 @@ func (p *PoloniexParser) RawTicker() (IParsableTicker, error) {
 	return &ticker, nil
 }
 
-func (t *PoloniexTicker) Coins() ([]*CurrencyPair, error) {
+func (t *poloniexTicker) Coins() ([]*CurrencyPair, error) {
 	pairs := make([]*CurrencyPair, len(*t))
 	var i int
 	for key := range *t {
@@ -61,8 +61,8 @@ func (t *PoloniexTicker) Coins() ([]*CurrencyPair, error) {
 	return pairs, nil
 }
 
-func (t *PoloniexTicker) Tickers() ([]*ParserTicker, error) {
-	tickers := []*ParserTicker{}
+func (t *poloniexTicker) Tickers() ([]*Ticker, error) {
+	tickers := []*Ticker{}
 	coins, _ := t.Coins()
 
 	for _, currency := range coins {
@@ -77,7 +77,7 @@ func (t *PoloniexTicker) Tickers() ([]*ParserTicker, error) {
 		}
 
 		first := lastDec.Sub(lastDec.Mul(diffDec))
-		ticker := &ParserTicker{
+		ticker := &Ticker{
 			currency,
 			data.Volume,
 			data.Last,
