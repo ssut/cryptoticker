@@ -1,6 +1,9 @@
 package cryptoticker
 
-import "github.com/parnurzeal/gorequest"
+import (
+	"github.com/fatih/structs"
+	"github.com/parnurzeal/gorequest"
+)
 
 const (
 	bithumbParserBaseURL    = "https://api.bithumb.com"
@@ -16,11 +19,18 @@ type bithumbMarketTicker struct {
 	First    string `json:"opening_price"`
 }
 
-type bithumbDataMap = map[string]bithumbMarketTicker
-
 type bithumbTicker struct {
 	Status string
-	Data   bithumbDataMap
+	Data   struct {
+		BTC  *bithumbMarketTicker
+		ETH  *bithumbMarketTicker
+		DASH *bithumbMarketTicker
+		LTC  *bithumbMarketTicker
+		ETC  *bithumbMarketTicker
+		XRP  *bithumbMarketTicker
+		BCH  *bithumbMarketTicker
+		XMR  *bithumbMarketTicker
+	}
 }
 
 type bithumbParser struct {
@@ -49,10 +59,15 @@ func (p *bithumbParser) RawTicker() (IParsableTicker, error) {
 }
 
 func (t *bithumbTicker) Coins() ([]*CurrencyPair, error) {
-	pairs := []*CurrencyPair{}
-	for key := range t.Data {
-		pair := &CurrencyPair{"KRW", key}
-		pairs = append(pairs, pair)
+	pairs := []*CurrencyPair{
+		&CurrencyPair{"KRW", "BTC"},
+		&CurrencyPair{"KRW", "ETH"},
+		&CurrencyPair{"KRW", "DASH"},
+		&CurrencyPair{"KRW", "LTC"},
+		&CurrencyPair{"KRW", "ETC"},
+		&CurrencyPair{"KRW", "XRP"},
+		&CurrencyPair{"KRW", "BCH"},
+		&CurrencyPair{"KRW", "XMR"},
 	}
 	return pairs, nil
 }
@@ -61,17 +76,29 @@ func (t *bithumbTicker) Tickers() ([]*Ticker, error) {
 	tickers := []*Ticker{}
 	coins, _ := t.Coins()
 
-	for _, currency := range coins {
-		data := t.Data[currency.Next]
-		ticker := &Ticker{
-			currency,
-			data.Volume1D,
-			data.Last,
-			data.High,
-			data.Low,
-			data.First,
+	s := structs.New(t.Data)
+	fields := s.Fields()
+	for _, field := range fields {
+		name := field.Name()
+		for _, currency := range coins {
+			if currency.Next == name {
+				t := field.Value()
+				if t == nil || field.IsZero() {
+					break
+				}
+				data := t.(*bithumbMarketTicker)
+				ticker := &Ticker{
+					currency,
+					data.Volume1D,
+					data.Last,
+					data.High,
+					data.Low,
+					data.First,
+				}
+				tickers = append(tickers, ticker)
+				break
+			}
 		}
-		tickers = append(tickers, ticker)
 	}
 
 	return tickers, nil
