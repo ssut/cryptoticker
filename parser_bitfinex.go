@@ -126,16 +126,17 @@ func (p *bitfinexParser) RawTicker() (IParsableTicker, error) {
 		for i, item := range raw.([]interface{}) {
 			// possible field name
 			fieldName := bitfinexMarketTickerOrder[i]
-			if item, ok := item.(string); ok {
+			switch v := item.(type) {
+			case string:
 				for _, p := range pairs {
-					if fmt.Sprintf("%s%s", p.Base, p.Next) == strings.ToUpper(item[1:]) {
+					if fmt.Sprintf("%s%s", p.Base, p.Next) == strings.ToUpper(v[1:]) {
 						market.Currency = p
+						break
 					}
 				}
-			}
-			if item, ok := item.(float64); ok {
+			case float64:
 				if field, ok := s.FieldOk(fieldName); ok {
-					field.Set(item)
+					field.Set(v)
 				}
 			}
 		}

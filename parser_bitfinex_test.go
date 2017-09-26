@@ -87,6 +87,12 @@ func TestBitfinexParser(t *testing.T) {
 				So(ticker.(*bitfinexTicker).pairs, ShouldResemble, expected.pairs)
 				So(ticker.(*bitfinexTicker).tickers, ShouldResemble, expected.tickers)
 
+				Convey(".Coins() should return the same pairs as .symbols()", func() {
+					coins, err := ticker.Coins()
+					So(err, ShouldBeNil)
+					So(coins, ShouldResemble, symbols)
+				})
+
 				Convey(".Ticker() should return a list of Ticker", func() {
 					expected := []*Ticker{
 						{
