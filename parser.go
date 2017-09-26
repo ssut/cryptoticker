@@ -10,6 +10,7 @@ const (
 	BithumbTicker                         // Bithumb
 	PoloniexTicker                        // Poloniex
 	BittrexTicker                         // Bittrex
+	BitfinexTicker                        // Bitfinex
 )
 
 // IParsableTicker represents a object that can parse and return Ticker
@@ -62,6 +63,8 @@ func NewParser(p TickerType) *Parser {
 		parser = newPoloniexParser()
 	case BittrexTicker:
 		parser = newBittrexParser()
+	case BitfinexTicker:
+		parser = newBitfinexParser()
 	}
 
 	return &Parser{parser: parser}
