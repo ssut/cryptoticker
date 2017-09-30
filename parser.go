@@ -1,16 +1,7 @@
 package cryptoticker
 
-import "strings"
-
-// TickerType represents makerts
-type TickerType int
-
-const (
-	CoinoneTicker  TickerType = 1 << iota // Coinone
-	BithumbTicker                         // Bithumb
-	PoloniexTicker                        // Poloniex
-	BittrexTicker                         // Bittrex
-	BitfinexTicker                        // Bitfinex
+import (
+	"strings"
 )
 
 // IParsableTicker represents a object that can parse and return Ticker
